@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FORMA — Theme Preview</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{ --gap: 16px; }
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',sans-serif;background:#0B0B0E;color:#fff;-webkit-font-smoothing:antialiased;margin:0}
+  .display{font-family:'Inter Tight',sans-serif;letter-spacing:-0.04em}
+  .glass{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
+  .reveal.in{opacity:1;transform:none}
+  .hero-photo{filter:grayscale(1) brightness(1.3) contrast(1.05)}
+  .shape-a{border-radius:36px 110px 36px 110px}
+  .shape-b{border-radius:110px 36px 110px 36px}
+  .no-scrollbar::-webkit-scrollbar{display:none}
+  .no-scrollbar{scrollbar-width:none}
+  .bar{transition:height .7s cubic-bezier(.2,.8,.2,1)}
+  .progress-fill{transition:width 1.6s cubic-bezier(.2,.8,.2,1)}
+  .trainer-img{transition:opacity .35s ease,transform .5s ease}
+  details summary::-webkit-details-marker{display:none}
+  details[open] .plus{transform:rotate(45deg)}
+  .plus{transition:transform .3s ease}
+  .section-title{display:flex;align-items:baseline;gap:14px;margin:8px 0 6px}
+  .section-title .dot{width:12px;height:12px;border-radius:999px;background:var(--accent)}
+  .swatch-card{position:relative;border-radius:20px;overflow:hidden;cursor:pointer;border:1px solid rgba(255,255,255,.08);transition:transform .3s ease,border-color .3s ease}
+  .swatch-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.25)}
+  .swatch-card.active{outline:2px solid #fff;outline-offset:2px}
+  .bar-fill{height:6px;border-radius:99px;background:var(--paper);overflow:hidden}
+  .bar-fill i{display:block;height:100%;background:var(--accent)}
+  .chip{font-size:11px;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.15)}
+  .sample-card{background:var(--paper);color:var(--ink);border-radius:18px;padding:14px}
+  .sample-card .accent{color:var(--accent)}
+  .sample-card .ink{color:var(--ink)}
+  .sample-card .muted{color:var(--ink);opacity:.55}
+  .sample-card .btn{background:var(--ink);color:var(--paper);padding:8px 14px;border-radius:99px;font-size:12px;display:inline-block}
+  .preview-frame{position:relative;border-radius:24px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:#000;scroll-margin-top:20px}
+  .preview-toolbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:rgba(11,11,14,.85);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.08)}
+  .preview-tabs{display:flex;gap:6px;background:rgba(255,255,255,.06);padding:4px;border-radius:99px}
+  .preview-tabs button{font-size:11px;padding:6px 12px;border-radius:99px;color:rgba(255,255,255,.7);background:transparent;border:0;cursor:pointer}
+  .preview-tabs button.active{background:#fff;color:#0B0B0E}
+
+  /* Theme tokens applied via [data-theme] on the preview-frame root */
+  .preview-frame{--accent:#2F5BEA;--accent-dark:#2347C4;--ink:#0C0C10;--paper:#F5F5F2;--gray:#B9B9BF;--page-bg:#E6E6E1}
+  .preview-frame[data-theme="blue"]     {--accent:#2F5BEA;--accent-dark:#2347C4;--ink:#0C0C10;--paper:#F5F5F2;--gray:#B9B9BF;--page-bg:#E6E6E1}
+  .preview-frame[data-theme="olive"]    {--accent:#5C6B3A;--accent-dark:#3E4A26;--ink:#14180E;--paper:#F1EFE6;--gray:#B5B1A4;--page-bg:#E9E6D8}
+  .preview-frame[data-theme="neon"]     {--accent:#39FF7A;--accent-dark:#1FD060;--ink:#0A0F08;--paper:#EAEAE2;--gray:#A8A89E;--page-bg:#0A0F08}
+  .preview-frame[data-theme="red"]      {--accent:#E54B3A;--accent-dark:#B8362A;--ink:#0E0A0A;--paper:#F2EFEC;--gray:#B5AFA8;--page-bg:#E9E4DF}
+  .preview-frame[data-theme="burgundy"] {--accent:#7A1F2B;--accent-dark:#5A1620;--ink:#16090C;--paper:#F1E9E8;--gray:#B29A9C;--page-bg:#E7D9DA}
+  .preview-frame[data-theme="golden"]   {--accent:#C99A2E;--accent-dark:#9C7519;--ink:#14110A;--paper:#F1ECDD;--gray:#B5A98C;--page-bg:#E8E1CB}
+  .preview-frame[data-theme="orange"]   {--accent:#E8772E;--accent-dark:#B85A1E;--ink:#160E07;--paper:#F2EADD;--gray:#B5A893;--page-bg:#E9DFC9}
+
+  .pf-section{background:var(--page-bg);color:var(--ink)}
+  .pf-section.alt{background:#fff}
+  .pf-card{background:var(--paper);color:var(--ink);border-radius:24px;padding:18px}
+  .pf-card.dark{background:var(--ink);color:#fff}
+  .pf-accent{color:var(--accent)}
+  .pf-accent-bg{background:var(--accent);color:var(--ink)}
+  .pf-accent-bg-dark{background:var(--ink);color:#fff}
+  .pf-muted{color:var(--ink);opacity:.6}
+  .pf-bar{height:8px;background:var(--paper);border-radius:99px;overflow:hidden}
+  .pf-bar i{display:block;height:100%;background:var(--accent)}
+  .pf-btn{padding:10px 18px;border-radius:99px;font-size:13px;display:inline-flex;gap:6px;align-items:center;border:1px solid var(--ink);color:var(--ink);background:transparent;cursor:pointer}
+  .pf-btn.fill{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .pf-btn.accent{background:var(--accent);color:var(--ink);border-color:var(--accent)}
+  .pf-ink-soft{color:var(--ink);opacity:.7}
+  .pf-grid{display:grid;gap:12px}
+  .pf-pill{font-size:11px;padding:2px 8px;border-radius:99px;background:var(--accent);color:var(--ink);font-weight:600}
+  .pf-divider{border-color:var(--ink);opacity:.1}
+  .pf-hero{position:relative;border-radius:20px;overflow:hidden;color:#fff;min-height:520px;display:flex;flex-direction:column}
+  .pf-hero .glass{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .pf-shape-a{border-radius:24px 80px 24px 80px;overflow:hidden}
+  .pf-shape-b{border-radius:80px 24px 80px 24px;overflow:hidden}
+</style>
+</head>
+<body>
+
+<!-- ======================= LANDING / THEME PICKER ======================= -->
+<header class="px-6 md:px-12 pt-10 md:pt-14 pb-6 max-w-[1400px] mx-auto">
+  <div class="flex items-center justify-between">
+    <a href="#" class="display text-2xl font-extrabold italic flex items-center gap-2">
+      <span class="grid place-items-center w-8 h-8 rounded-full bg-white text-[#0B0B0E] not-italic text-sm font-extrabold">F</span>FORMA<span class="text-white/70">+</span>
+    </a>
+    <span class="text-xs text-white/50">Single-file theme preview · 7 palettes</span>
+  </div>
+</header>
+
+<section class="px-6 md:px-12 max-w-[1400px] mx-auto pt-6 pb-10">
+  <p class="text-xs text-white/50 mb-4">FORMA · Gym management SaaS — color variants</p>
+  <h1 class="display font-extrabold leading-[.9]" style="font-size:clamp(2.4rem,7vw,5.5rem)">
+    Pick a palette.<br>
+    <span class="text-white/50">See the same page, seven ways.</span>
+  </h1>
+  <p class="text-white/60 mt-5 max-w-xl text-sm">Every theme is rendered with the same components and the same layout. Click a card to jump to a full preview, or scroll to compare them side by side.</p>
+</section>
+
+<section class="px-6 md:px-12 max-w-[1400px] mx-auto pb-16">
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" id="themeCards">
+    <!-- card 1 — Blue -->
+    <a href="#preview-blue" data-theme="blue" class="swatch-card group">
+      <div class="relative h-44" style="background:#0C0C10">
+        <img class="absolute inset-0 w-full h-full object-cover" style="filter:grayscale(1) brightness(1.2)" src="https://images.pexels.com/photos/27948294/pexels-photo-27948294.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900" alt="">
+        <div class="absolute inset-0" style="background:#2F5BEA;mix-blend-mode:color;opacity:.65"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="display text-white/95 font-extrabold" style="font-size:clamp(2rem,5vw,3.5rem)">STRONGER<br>TOGETHER</span>
+        </div>
+      </div>
+      <div class="p-5" style="background:#0C0C10">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="display text-xl font-semibold text-white">Electric Blue</h3>
+          <span class="chip">#2F5BEA</span>
+        </div>
+        <p class="text-xs text-white/60 mb-4">Athletic, high-energy. Bold headlines and crisp cards.</p>
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-full" style="background:#2F5BEA"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#2347C4"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#0C0C10;border:1px solid rgba(255,255,255,.15)"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#F5F5F2"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#B9B9BF"></div>
+        </div>
+      </div>
+    </a>
+
+    <!-- card 2 — Olive -->
+    <a href="#preview-olive" data-theme="olive" class="swatch-card group">
+      <div class="relative h-44" style="background:#14180E">
+        <img class="absolute inset-0 w-full h-full object-cover" style="filter:grayscale(1) brightness(1.05) sepia(.3)" src="https://images.pexels.com/photos/27948294/pexels-photo-27948294.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900" alt="">
+        <div class="absolute inset-0" style="background:#5C6B3A;mix-blend-mode:color;opacity:.7"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="display text-white/95 font-extrabold" style="font-size:clamp(2rem,5vw,3.5rem)">STRONGER<br>TOGETHER</span>
+        </div>
+      </div>
+      <div class="p-5" style="background:#14180E">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="display text-xl font-semibold text-white">Olive Green</h3>
+          <span class="chip">#5C6B3A</span>
+        </div>
+        <p class="text-xs text-white/60 mb-4">Earthy, grounded. Natural-paper base with a deep forest accent.</p>
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-full" style="background:#5C6B3A"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#3E4A26"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#14180E;border:1px solid rgba(255,255,255,.15)"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#F1EFE6"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#B5B1A4"></div>
+        </div>
+      </div>
+    </a>
+
+    <!-- card 3 — Neon -->
+    <a href="#preview-neon" data-theme="neon" class="swatch-card group">
+      <div class="relative h-44" style="background:#0A0F08">
+        <img class="absolute inset-0 w-full h-full object-cover" style="filter:grayscale(1) brightness(.8) contrast(1.1)" src="https://images.pexels.com/photos/27948294/pexels-photo-27948294.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900" alt="">
+        <div class="absolute inset-0" style="background:#1FD060;mix-blend-mode:color;opacity:.35"></div>
+        <div class="absolute inset-0" style="background:#0A0F08;mix-blend-mode:multiply"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="display font-extrabold" style="font-size:clamp(2rem,5vw,3.5rem);color:#39FF7A">STRONGER<br>TOGETHER</span>
+        </div>
+      </div>
+      <div class="p-5" style="background:#0A0F08">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="display text-xl font-semibold text-white">Neon Green</h3>
+          <span class="chip">#39FF7A</span>
+        </div>
+        <p class="text-xs text-white/60 mb-4">Dark, high-contrast. Sport-tech feel with an electric accent.</p>
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-full" style="background:#39FF7A"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#1FD060"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#0A0F08;border:1px solid rgba(255,255,255,.15)"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#EAEAE2"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#A8A89E"></div>
+        </div>
+      </div>
+    </a>
+
+    <!-- card 4 — Red -->
+    <a href="#preview-red" data-theme="red" class="swatch-card group">
+      <div class="relative h-44" style="background:#0E0A0A">
+        <img class="absolute inset-0 w-full h-full object-cover" style="filter:grayscale(1) brightness(1.1) contrast(1.05)" src="https://images.pexels.com/photos/27948294/pexels-photo-27948294.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900" alt="">
+        <div class="absolute inset-0" style="background:#E54B3A;mix-blend-mode:color;opacity:.6"></div>
+        <div class="absolute inset-0" style="background:#0E0A0A;mix-blend-mode:multiply;opacity:.4"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="display font-extrabold text-white" style="font-size:clamp(2rem,5vw,3.5rem)">STRONGER<br>TOGETHER</span>
+        </div>
+      </div>
+      <div class="p-5" style="background:#0E0A0A">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="display text-xl font-semibold text-white">Sport Red</h3>
+          <span class="chip">#E54B3A</span>
+        </div>
+        <p class="text-xs text-white/60 mb-4">Bold and athletic. Built for performance-driven brands.</p>
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-full" style="background:#E54B3A"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#B8362A"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#0E0A0A;border:1px solid rgba(255,255,255,.15)"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#F2EFEC"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#B5AFA8"></div>
+        </div>
+      </div>
+    </a>
+
+    <!-- card 5 — Burgundy -->
+    <a href="#preview-burgundy" data-theme="burgundy" class="swatch-card group">
+      <div class="relative h-44" style="background:#16090C">
+        <img class="absolute inset-0 w-full h-full object-cover" style="filter:grayscale(1) brightness(.95) contrast(1.05)" src="https://images.pexels.com/photos/27948294/pexels-photo-27948294.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900" alt="">
+        <div class="absolute inset-0" style="background:#7A1F2B;mix-blend-mode:color;opacity:.7"></div>
+        <div class="absolute inset-0" style="background:#16090C;mix-blend-mode:multiply;opacity:.35"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="display font-extrabold text-white" style="font-size:clamp(2rem,5vw,3.5rem)">STRONGER<br>TOGETHER</span>
+        </div>
+      </div>
+      <div class="p-5" style="background:#16090C">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="display text-xl font-semibold text-white">Burgundy</h3>
+          <span class="chip">#7A1F2B</span>
+        </div>
+        <p class="text-xs text-white/60 mb-4">Deep, refined, premium. A boutique-club signature look.</p>
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-full" style="background:#7A1F2B"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#5A1620"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#16090C;border:1px solid rgba(255,255,255,.15)"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#F1E9E8"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#B29A9C"></div>
+        </div>
+      </div>
+    </a>
+
+    <!-- card 6 — Golden -->
+    <a href="#preview-golden" data-theme="golden" class="swatch-card group">
+      <div class="relative h-44" style="background:#14110A">
+        <img class="absolute inset-0 w-full h-full object-cover" style="filter:grayscale(1) brightness(1.1) sepia(.2)" src="https://images.pexels.com/photos/27948294/pexels-photo-27948294.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900" alt="">
+        <div class="absolute inset-0" style="background:#C99A2E;mix-blend-mode:color;opacity:.55"></div>
+        <div class="absolute inset-0" style="background:#14110A;mix-blend-mode:multiply;opacity:.4"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="display font-extrabold text-white" style="font-size:clamp(2rem,5vw,3.5rem)">STRONGER<br>TOGETHER</span>
+        </div>
+      </div>
+      <div class="p-5" style="background:#14110A">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="display text-xl font-semibold text-white">Golden</h3>
+          <span class="chip">#C99A2E</span>
+        </div>
+        <p class="text-xs text-white/60 mb-4">Warm, considered, members-club energy on a deep ink base.</p>
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-full" style="background:#C99A2E"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#9C7519"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#14110A;border:1px solid rgba(255,255,255,.15)"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#F1ECDD"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#B5A98C"></div>
+        </div>
+      </div>
+    </a>
+
+    <!-- card 7 — Orange -->
+    <a href="#preview-orange" data-theme="orange" class="swatch-card group">
+      <div class="relative h-44" style="background:#160E07">
+        <img class="absolute inset-0 w-full h-full object-cover" style="filter:grayscale(1) brightness(1.1) contrast(1.05)" src="https://images.pexels.com/photos/27948294/pexels-photo-27948294.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900" alt="">
+        <div class="absolute inset-0" style="background:#E8772E;mix-blend-mode:color;opacity:.65"></div>
+        <div class="absolute inset-0" style="background:#160E07;mix-blend-mode:multiply;opacity:.4"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="display font-extrabold text-white" style="font-size:clamp(2rem,5vw,3.5rem)">STRONGER<br>TOGETHER</span>
+        </div>
+      </div>
+      <div class="p-5" style="background:#160E07">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="display text-xl font-semibold text-white">Sunset Orange</h3>
+          <span class="chip">#E8772E</span>
+        </div>
+        <p class="text-xs text-white/60 mb-4">Energetic and warm. A high-energy HIIT or cycling brand.</p>
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-full" style="background:#E8772E"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#B85A1E"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#160E07;border:1px solid rgba(255,255,255,.15)"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#F2EADD"></div>
+          <div class="w-6 h-6 rounded-full" style="background:#B5A893"></div>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<section class="px-6 md:px-12 max-w-[1400px] mx-auto pb-6">
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+    <div class="pf-card pf-grid" style="background:#15151B;color:#fff">
+      <span class="pf-pill" style="background:#2F5BEA;color:#fff">Blue</span>
+      <h4 class="display text-lg font-semibold">Quick stats card</h4>
+      <p class="text-xs text-white/60">Active members, check-ins, revenue — same card across all themes.</p>
+      <div class="pf-bar"><i style="width:78%;background:#2F5BEA"></i></div>
+      <div class="flex justify-between text-xs text-white/70"><span>Workouts</span><span class="font-semibold text-white">5/6</span></div>
+      <div class="flex justify-between text-xs text-white/70"><span>Calories</span><span class="font-semibold text-white">2,450</span></div>
+      <button class="pf-btn accent" style="background:#2F5BEA;color:#fff;border-color:#2F5BEA;justify-self:start">Book a demo ↗</button>
+    </div>
+    <div class="pf-card pf-grid" style="background:#15151B;color:#fff">
+      <span class="pf-pill" style="background:#5C6B3A;color:#fff">Olive</span>
+      <h4 class="display text-lg font-semibold">Quick stats card</h4>
+      <p class="text-xs text-white/60">Active members, check-ins, revenue — same card across all themes.</p>
+      <div class="pf-bar"><i style="width:78%;background:#5C6B3A"></i></div>
+      <div class="flex justify-between text-xs text-white/70"><span>Workouts</span><span class="font-semibold text-white">5/6</span></div>
+      <div class="flex justify-between text-xs text-white/70"><span>Calories</span><span class="font-semibold text-white">2,450</span></div>
+      <button class="pf-btn accent" style="background:#5C6B3A;color:#fff;border-color:#5C6B3A;justify-self:start">Book a demo ↗</button>
+    </div>
+    <div class="pf-card pf-grid" style="background:#15151B;color:#fff">
+      <span class="pf-pill" style="background:#39FF7A;color:#0A0F08">Neon</span>
+      <h4 class="display text-lg font-semibold">Quick stats card</h4>
+      <p class="text-xs text-white/60">Active members, check-ins, revenue — same card across all themes.</p>
+      <div class="pf-bar"><i style="width:78%;background:#39FF7A"></i></div>
+      <div class="flex justify-between text-xs text-white/70"><span>Workouts</span><span class="font-semibold text-white">5/6</span></div>
+      <div class="flex justify-between text-xs text-white/70"><span>Calories</span><span class="font-semibold text-white">2,450</span></div>
+      <button class="pf-btn accent" style="background:#39FF7A;color:#0A0F08;border-color:#39FF7A;justify-self:start">Book a demo ↗</button>
+    </div>
+    <div class="pf-card pf-grid" style="background:#15151B;color:#fff">
+      <span class="pf-pill" style="background:#E54B3A;color:#fff">Red</span>
+      <h4 class="display text-lg font-semibold">Quick stats card</h4>
+      <p class="text-xs text-white/60">Active members, check-ins, revenue — same card across all themes.</p>
+      <div class="pf-bar"><i style="width:78%;background:#E54B3A"></i></div>
+      <div class="flex justify-between text-xs text-white/70"><span>Workouts</span><span class="font-semibold text-white">5/6</span></div>
+      <div class="flex justify-between text-xs text-white/70"><span>Calories</span><span class="font-semibold text-white">2,450</span></div>
+      <button class="pf-btn accent" style="background:#E54B3A;color:#fff;border-color:#E54B3A;justify-self:start">Book a demo ↗</button>
+    </div>
+    <div class="pf-card pf-grid" style="background:#15151B;color:#fff">
+      <span class="pf-pill" style="background:#7A1F2B;color:#fff">Burgundy</span>
+      <h4 class="display text-lg font-semibold">Quick stats card</h4>
+      <p class="text-xs text-white/60">Active members, check-ins, revenue — same card across all themes.</p>
+      <div class="pf-bar"><i style="width:78%;background:#7A1F2B"></i></div>
+      <div class="flex justify-between text-xs text-white/70"><span>Workouts</span><span class="font-semibold text-white">5/6</span></div>
+      <div class="flex justify-between text-xs text-white/70"><span>Calories</span><span class="font-semibold text-white">2,450</span></div>
+      <button class="pf-btn accent" style="background:#7A1F2B;color:#fff;border-color:#7A1F2B;justify-self:start">Book a demo ↗</button>
+    </div>
+    <div class="pf-card pf-grid" style="background:#15151B;color:#fff">
+      <span class="pf-pill" style="background:#C99A2E;color:#14110A">Golden</span>
+      <h4 class="display text-lg font-semibold">Quick stats card</h4>
+      <p class="text-xs text-white/60">Active members, check-ins, revenue — same card across all themes.</p>
+      <div class="pf-bar"><i style="width:78%;background:#C99A2E"></i></div>
+      <div class="flex justify-between text-xs text-white/70"><span>Workouts</span><span class="font-semibold text-white">5/6</span></div>
+      <div class="flex justify-between text-xs text-white/70"><span>Calories</span><span class="font-semibold text-white">2,450</span></div>
+      <button class="pf-btn accent" style="background:#C99A2E;color:#14110A;border-color:#C99A2E;justify-self:start">Book a demo ↗</button>
+    </div>
+    <div class="pf-card pf-grid" style="background:#15151B;color:#fff">
+      <span class="pf-pill" style="background:#E8772E;color:#160E07">Orange</span>
+      <h4 class="display text-lg font-semibold">Quick stats card</h4>
+      <p class="text-xs text-white/60">Active members, check-ins, revenue — same card across all themes.</p>
+      <div class="pf-bar"><i style="width:78%;background:#E8772E"></i></div>
+      <div class="flex justify-between text-xs text-white/70"><span>Workouts</span><span class="font-semibold text-white">5/6</span></div>
+      <div class="flex justify-between text-xs text-white/70"><span>Calories</span><span class="font-semibold text-white">2,450</span></div>
+      <button class="pf-btn accent" style="background:#E8772E;color:#160E07;border-color:#E8772E;justify-self:start">Book a demo ↗</button>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= PREVIEW 1 — BLUE ======================= -->
+<div id="preview-blue" data-theme="blue" class="preview-frame max-w-[1400px] mx-auto my-6">
+  <div class="preview-toolbar">
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-white/60">Theme</span>
+      <span class="text-sm font-medium text-white">Electric Blue</span>
+    </div>
+    <div class="preview-tabs">
+      <button class="active" data-tab="blue">Full page</button>
+      <button data-tab="all">All themes</button>
+    </div>
+  </div>
+  <div class="pf-section">
+    <!-- HERO -->
+    <div class="px-3 pt-3">
+      <div class="pf-hero m-2 md:m-3 rounded-[28px] overflow-hidden min-h-[820px]" style="background:#2F5BEA">
+        <img class="hero-photo absolute inset-0 w-full h-full object-cover" src="https://images.pexels.com/photos/27948294/pexels-photo-27948294.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1100&w=1800" alt="">
+        <div class="absolute inset-0" style="background:#3D68F2;mix-blend-mode:multiply"></div>
+        <div class="absolute inset-0" style="background:#2F5BEA;mix-blend-mode:color;opacity:.55"></div>
+        <div class="relative z-10 flex items-center justify-between px-5 md:px-8 py-5">
+          <span class="display text-2xl font-extrabold italic flex items-center gap-2 text-white">
+            <span class="grid place-items-center w-8 h-8 rounded-full bg-white text-[#2F5BEA] not-italic text-sm font-extrabold">F</span>FORMA<span class="text-white/70">+</span>
+          </span>
+          <span class="bg-white text-[#2F5BEA] text-sm font-medium px-5 py-2.5 rounded-full">Book a demo ↗</span>
+        </div>
+        <div class="relative z-10 text-center px-4 mt-4">
+          <h2 class="display font-extrabold leading-[.86] text-white/90" style="font-size:clamp(3rem,11vw,9rem)">STRONGER<br>TOGETHER</h2>
+        </div>
+        <div class="relative z-10 flex-1 flex items-center justify-between px-5 md:px-10 py-8 gap-6 text-white">
+          <div class="flex items-center gap-3">
+            <span class="w-14 h-14 rounded-full bg-white text-[#2F5BEA] grid place-items-center">▶</span>
+            <span class="text-xs"><span class="block font-medium">WATCH VIDEO</span><span class="text-white/70">See the platform in 90s</span></span>
+          </div>
+          <div class="max-w-[260px] text-sm text-right">
+            <p class="mb-4">Run memberships, classes and coaching from one calm dashboard.</p>
+            <a class="inline-block bg-white text-[#2F5BEA] font-medium px-6 py-3 rounded-full">Start your journey ↗</a>
+          </div>
+        </div>
+        <div class="relative z-10 grid md:grid-cols-3 gap-3 px-4 md:px-6 pb-6">
+          <div class="glass rounded-3xl p-5 text-white">
+            <div class="display text-4xl font-semibold">25K+</div>
+            <p class="text-sm text-white/80">Happy members on FORMA</p>
+          </div>
+          <div class="bg-white text-[#0C0C10] rounded-3xl p-5">
+            <div class="flex justify-between text-sm mb-3"><span class="text-[#0C0C10]/70">This week progress</span><span class="display text-2xl font-semibold">78%</span></div>
+            <div class="h-2.5 bg-[#E8E8EC] rounded-full overflow-hidden mb-5"><div class="h-full bg-[#2F5BEA] rounded-full" style="width:78%"></div></div>
+            <div class="grid grid-cols-4 text-center divide-x divide-[#E8E8EC] text-xs text-[#0C0C10]/60">
+              <div>Workouts<p class="display font-semibold text-base text-[#0C0C10]">5/6</p></div>
+              <div>Calories<p class="display font-semibold text-base text-[#0C0C10]">2,450</p></div>
+              <div>Days<p class="display font-semibold text-base text-[#0C0C10]">6</p></div>
+              <div>Hours<p class="display font-semibold text-base text-[#0C0C10]">4.8</p></div>
+            </div>
+          </div>
+          <div class="glass rounded-3xl p-4 flex items-center gap-4 text-white">
+            <img class="w-24 h-24 rounded-2xl object-cover object-top" src="https://images.pexels.com/photos/31918891/pexels-photo-31918891.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=300&w=300" alt="">
+            <div>
+              <p class="text-[11px] text-white/70">Your trainer</p>
+              <p class="display text-xl font-semibold leading-tight">Alex Morgan</p>
+              <p class="text-xs text-white/70">Strength coach</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- TRUST + COACHES -->
+    <div class="px-5 md:px-10 pt-10">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+        <div class="w-40 h-40 md:w-44 md:h-44 rounded-full bg-white grid place-items-center text-center p-6">
+          <div><p class="display text-4xl font-semibold">100%</p><p class="text-[11px] text-[#0C0C10]/60">Train with the best to become your best</p></div>
+        </div>
+        <div class="bg-white rounded-[28px] rounded-br-[80px] p-7 max-w-xl flex gap-6">
+          <span class="display text-3xl font-semibold">#01</span>
+          <div><h3 class="display text-xl font-semibold mb-2">Trusted by thousands of gyms</h3><p class="text-sm text-[#0C0C10]/60">Join the studios, clubs and training floors that rely on FORMA.</p></div>
+        </div>
+      </div>
+    </div>
+    <!-- DASHBOARD -->
+    <div class="px-3 md:px-6 pt-16 pb-10">
+      <div class="bg-white rounded-[32px] p-6 md:p-10">
+        <div class="grid lg:grid-cols-[.7fr_1.6fr] gap-10">
+          <div>
+            <h2 class="display text-4xl md:text-5xl font-semibold leading-[1] mb-5">One dashboard.<br><span class="text-[#B9B9BF]">Every part of your gym.</span></h2>
+            <p class="text-sm text-[#0C0C10]/60 mb-6 max-w-sm">Memberships, bookings, billing and coaching — all in one place.</p>
+            <ul class="divide-y divide-[#0C0C10]/10 border-y border-[#0C0C10]/10 text-sm">
+              <li class="flex justify-between py-3"><span>01 &nbsp; Member management</span><span class="text-[#2F5BEA]">→</span></li>
+              <li class="flex justify-between py-3"><span>02 &nbsp; Class scheduling</span><span class="text-[#2F5BEA]">→</span></li>
+              <li class="flex justify-between py-3"><span>03 &nbsp; Billing &amp; payments</span><span class="text-[#2F5BEA]">→</span></li>
+            </ul>
+          </div>
+          <div class="bg-[#F5F5F2] rounded-3xl p-5">
+            <p class="display text-2xl font-semibold mb-4">Studio overview</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#0C0C10]/50">Members</p><p class="display text-xl font-semibold">1,284</p><p class="text-[11px] text-[#2F5BEA]">+4.2%</p></div>
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#0C0C10]/50">Check-ins</p><p class="display text-xl font-semibold">3,842</p><p class="text-[11px] text-[#2F5BEA]">+12%</p></div>
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#0C0C10]/50">Revenue</p><p class="display text-xl font-semibold">$48.2k</p><p class="text-[11px] text-[#2F5BEA]">+8.1%</p></div>
+              <div class="bg-[#2F5BEA] text-white rounded-2xl p-3"><p class="text-[11px] text-white/70">Retention</p><p class="display text-xl font-semibold">92%</p></div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 flex items-end gap-1.5 h-32">
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:55%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:70%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:62%"></div>
+              <div class="flex-1 rounded-t bg-[#2F5BEA]" style="height:88%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:78%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:48%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:40%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- PRICING + FAQ + CTA -->
+    <div class="px-5 md:px-10 pt-8">
+      <h2 class="display text-4xl md:text-5xl font-semibold mb-8 text-center">Simple pricing.<br><span class="text-[#B9B9BF]">No surprises.</span></h2>
+      <div class="grid md:grid-cols-3 gap-3">
+        <div class="bg-white rounded-3xl p-6"><p class="text-sm text-[#0C0C10]/60">Starter</p><p class="display text-4xl font-semibold mt-2">$49<span class="text-base text-[#0C0C10]/50 font-normal">/mo</span></p><p class="text-xs text-[#0C0C10]/60 mt-1 mb-4">For boutique studios.</p><button class="pf-btn w-full justify-center">Choose Starter</button></div>
+        <div class="bg-[#2F5BEA] text-white rounded-3xl p-6"><div class="flex justify-between"><p class="text-sm text-white/80">Growth</p><span class="text-[10px] bg-white text-[#2F5BEA] rounded-full px-2 py-0.5 font-medium">Most popular</span></div><p class="display text-4xl font-semibold mt-2">$129<span class="text-base text-white/70 font-normal">/mo</span></p><p class="text-xs text-white/80 mt-1 mb-4">For growing gyms.</p><button class="pf-btn w-full justify-center" style="background:#fff;color:#2F5BEA;border-color:#fff">Choose Growth</button></div>
+        <div class="bg-white rounded-3xl p-6"><p class="text-sm text-[#0C0C10]/60">Scale</p><p class="display text-4xl font-semibold mt-2">$299<span class="text-base text-[#0C0C10]/50 font-normal">/mo</span></p><p class="text-xs text-[#0C0C10]/60 mt-1 mb-4">For multi-location clubs.</p><button class="pf-btn w-full justify-center">Choose Scale</button></div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-12">
+      <div class="bg-[#2F5BEA] text-white rounded-[32px] p-8 text-center">
+        <h3 class="display font-extrabold" style="font-size:clamp(2rem,6vw,4.5rem)">GAME ON,<br><span class="text-white/60">RUN IT HARD.</span></h3>
+        <p class="text-sm text-white/80 mt-3 mb-5">Start your free 14-day trial. No card required.</p>
+        <div class="flex gap-2 max-w-sm mx-auto">
+          <input class="flex-1 rounded-full px-5 py-3 text-sm bg-white text-[#0C0C10]" placeholder="you@yourgym.com">
+          <button class="rounded-full px-5 py-3 text-sm font-medium bg-[#0C0C10] text-white">Get started ↗</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= PREVIEW 2 — OLIVE ======================= -->
+<div id="preview-olive" data-theme="olive" class="preview-frame max-w-[1400px] mx-auto my-6">
+  <div class="preview-toolbar">
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-white/60">Theme</span>
+      <span class="text-sm font-medium text-white">Olive Green</span>
+    </div>
+    <div class="preview-tabs">
+      <button class="active" data-tab="olive">Full page</button>
+      <button data-tab="all">All themes</button>
+    </div>
+  </div>
+  <div class="pf-section" style="background:#E9E6D8">
+    <div class="px-3 pt-3">
+      <div class="pf-hero m-2 md:m-3 rounded-[28px] overflow-hidden min-h-[820px]" style="background:#5C6B3A">
+        <img class="hero-photo absolute inset-0 w-full h-full object-cover" src="https://images.pexels.com/photos/27948294/pexels-photo-27948294.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1100&w=1800" alt="">
+        <div class="absolute inset-0" style="background:#6E7E45;mix-blend-mode:multiply"></div>
+        <div class="absolute inset-0" style="background:#5C6B3A;mix-blend-mode:color;opacity:.55"></div>
+        <div class="relative z-10 flex items-center justify-between px-5 md:px-8 py-5">
+          <span class="display text-2xl font-extrabold italic flex items-center gap-2 text-white">
+            <span class="grid place-items-center w-8 h-8 rounded-full bg-white text-[#5C6B3A] not-italic text-sm font-extrabold">F</span>FORMA<span class="text-white/70">+</span>
+          </span>
+          <span class="bg-white text-[#5C6B3A] text-sm font-medium px-5 py-2.5 rounded-full">Book a demo ↗</span>
+        </div>
+        <div class="relative z-10 text-center px-4 mt-4">
+          <h2 class="display font-extrabold leading-[.86] text-white/90" style="font-size:clamp(3rem,11vw,9rem)">STRONGER<br>TOGETHER</h2>
+        </div>
+        <div class="relative z-10 flex-1 flex items-center justify-between px-5 md:px-10 py-8 gap-6 text-white">
+          <div class="flex items-center gap-3">
+            <span class="w-14 h-14 rounded-full bg-white text-[#5C6B3A] grid place-items-center">▶</span>
+            <span class="text-xs"><span class="block font-medium">WATCH VIDEO</span><span class="text-white/70">See the platform in 90s</span></span>
+          </div>
+          <div class="max-w-[260px] text-sm text-right">
+            <p class="mb-4">Run memberships, classes and coaching from one calm dashboard.</p>
+            <a class="inline-block bg-white text-[#5C6B3A] font-medium px-6 py-3 rounded-full">Start your journey ↗</a>
+          </div>
+        </div>
+        <div class="relative z-10 grid md:grid-cols-3 gap-3 px-4 md:px-6 pb-6">
+          <div class="glass rounded-3xl p-5 text-white">
+            <div class="display text-4xl font-semibold">25K+</div>
+            <p class="text-sm text-white/80">Happy members on FORMA</p>
+          </div>
+          <div class="bg-white text-[#14180E] rounded-3xl p-5">
+            <div class="flex justify-between text-sm mb-3"><span class="text-[#14180E]/70">This week progress</span><span class="display text-2xl font-semibold">78%</span></div>
+            <div class="h-2.5 bg-[#E8E8EC] rounded-full overflow-hidden mb-5"><div class="h-full bg-[#5C6B3A] rounded-full" style="width:78%"></div></div>
+            <div class="grid grid-cols-4 text-center divide-x divide-[#E8E8EC] text-xs text-[#14180E]/60">
+              <div>Workouts<p class="display font-semibold text-base text-[#14180E]">5/6</p></div>
+              <div>Calories<p class="display font-semibold text-base text-[#14180E]">2,450</p></div>
+              <div>Days<p class="display font-semibold text-base text-[#14180E]">6</p></div>
+              <div>Hours<p class="display font-semibold text-base text-[#14180E]">4.8</p></div>
+            </div>
+          </div>
+          <div class="glass rounded-3xl p-4 flex items-center gap-4 text-white">
+            <img class="w-24 h-24 rounded-2xl object-cover object-top" src="https://images.pexels.com/photos/31918891/pexels-photo-31918891.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=300&w=300" alt="">
+            <div><p class="text-[11px] text-white/70">Your trainer</p><p class="display text-xl font-semibold leading-tight">Alex Morgan</p><p class="text-xs text-white/70">Strength coach</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-10">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+        <div class="w-40 h-40 md:w-44 md:h-44 rounded-full bg-white grid place-items-center text-center p-6">
+          <div><p class="display text-4xl font-semibold">100%</p><p class="text-[11px] text-[#14180E]/60">Train with the best to become your best</p></div>
+        </div>
+        <div class="bg-white rounded-[28px] rounded-br-[80px] p-7 max-w-xl flex gap-6">
+          <span class="display text-3xl font-semibold">#01</span>
+          <div><h3 class="display text-xl font-semibold mb-2">Trusted by thousands of gyms</h3><p class="text-sm text-[#14180E]/60">Join the studios, clubs and training floors that rely on FORMA.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="px-3 md:px-6 pt-16 pb-10">
+      <div class="bg-white rounded-[32px] p-6 md:p-10">
+        <div class="grid lg:grid-cols-[.7fr_1.6fr] gap-10">
+          <div>
+            <h2 class="display text-4xl md:text-5xl font-semibold leading-[1] mb-5">One dashboard.<br><span class="text-[#B5B1A4]">Every part of your gym.</span></h2>
+            <p class="text-sm text-[#14180E]/60 mb-6 max-w-sm">Memberships, bookings, billing and coaching — all in one place.</p>
+            <ul class="divide-y divide-[#14180E]/10 border-y border-[#14180E]/10 text-sm">
+              <li class="flex justify-between py-3"><span>01 &nbsp; Member management</span><span class="text-[#5C6B3A]">→</span></li>
+              <li class="flex justify-between py-3"><span>02 &nbsp; Class scheduling</span><span class="text-[#5C6B3A]">→</span></li>
+              <li class="flex justify-between py-3"><span>03 &nbsp; Billing &amp; payments</span><span class="text-[#5C6B3A]">→</span></li>
+            </ul>
+          </div>
+          <div class="bg-[#EBE8DC] rounded-3xl p-5">
+            <p class="display text-2xl font-semibold mb-4">Studio overview</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#14180E]/50">Members</p><p class="display text-xl font-semibold">1,284</p><p class="text-[11px] text-[#5C6B3A]">+4.2%</p></div>
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#14180E]/50">Check-ins</p><p class="display text-xl font-semibold">3,842</p><p class="text-[11px] text-[#5C6B3A]">+12%</p></div>
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#14180E]/50">Revenue</p><p class="display text-xl font-semibold">$48.2k</p><p class="text-[11px] text-[#5C6B3A]">+8.1%</p></div>
+              <div class="bg-[#5C6B3A] text-white rounded-2xl p-3"><p class="text-[11px] text-white/70">Retention</p><p class="display text-xl font-semibold">92%</p></div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 flex items-end gap-1.5 h-32">
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:55%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:70%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:62%"></div>
+              <div class="flex-1 rounded-t bg-[#5C6B3A]" style="height:88%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:78%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:48%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:40%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-8">
+      <h2 class="display text-4xl md:text-5xl font-semibold mb-8 text-center">Simple pricing.<br><span class="text-[#B5B1A4]">No surprises.</span></h2>
+      <div class="grid md:grid-cols-3 gap-3">
+        <div class="bg-white rounded-3xl p-6"><p class="text-sm text-[#14180E]/60">Starter</p><p class="display text-4xl font-semibold mt-2">$49<span class="text-base text-[#14180E]/50 font-normal">/mo</span></p><p class="text-xs text-[#14180E]/60 mt-1 mb-4">For boutique studios.</p><button class="pf-btn w-full justify-center">Choose Starter</button></div>
+        <div class="bg-[#5C6B3A] text-white rounded-3xl p-6"><div class="flex justify-between"><p class="text-sm text-white/80">Growth</p><span class="text-[10px] bg-white text-[#5C6B3A] rounded-full px-2 py-0.5 font-medium">Most popular</span></div><p class="display text-4xl font-semibold mt-2">$129<span class="text-base text-white/70 font-normal">/mo</span></p><p class="text-xs text-white/80 mt-1 mb-4">For growing gyms.</p><button class="pf-btn w-full justify-center" style="background:#fff;color:#5C6B3A;border-color:#fff">Choose Growth</button></div>
+        <div class="bg-white rounded-3xl p-6"><p class="text-sm text-[#14180E]/60">Scale</p><p class="display text-4xl font-semibold mt-2">$299<span class="text-base text-[#14180E]/50 font-normal">/mo</span></p><p class="text-xs text-[#14180E]/60 mt-1 mb-4">For multi-location clubs.</p><button class="pf-btn w-full justify-center">Choose Scale</button></div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-12">
+      <div class="bg-[#5C6B3A] text-white rounded-[32px] p-8 text-center">
+        <h3 class="display font-extrabold" style="font-size:clamp(2rem,6vw,4.5rem)">GAME ON,<br><span class="text-white/60">RUN IT HARD.</span></h3>
+        <p class="text-sm text-white/80 mt-3 mb-5">Start your free 14-day trial. No card required.</p>
+        <div class="flex gap-2 max-w-sm mx-auto">
+          <input class="flex-1 rounded-full px-5 py-3 text-sm bg-white text-[#14180E]" placeholder="you@yourgym.com">
+          <button class="rounded-full px-5 py-3 text-sm font-medium bg-[#14180E] text-white">Get started ↗</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= PREVIEW 3 — NEON ======================= -->
+<div id="preview-neon" data-theme="neon" class="preview-frame max-w-[1400px] mx-auto my-6">
+  <div class="preview-toolbar">
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-white/60">Theme</span>
+      <span class="text-sm font-medium text-white">Neon Green</span>
+    </div>
+    <div class="preview-tabs">
+      <button class="active" data-tab="neon">Full page</button>
+      <button data-tab="all">All themes</button>
+    </div>
+  </div>
+  <div class="pf-section" style="background:#EAEAE2">
+    <div class="px-3 pt-3">
+      <div class="pf-hero m-2 md:m-3 rounded-[28px] overflow-hidden min-h-[820px]" style="background:#0A0F08">
+        <img class="hero-photo absolute inset-0 w-full h-full object-cover" src="https://images.pexels.com/photos/27948294/pexels-photo-27948294.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1100&w=1800" alt="">
+        <div class="absolute inset-0" style="background:#0A0F08;mix-blend-mode:multiply"></div>
+        <div class="absolute inset-0" style="background:#1FD060;mix-blend-mode:color;opacity:.35"></div>
+        <div class="relative z-10 flex items-center justify-between px-5 md:px-8 py-5">
+          <span class="display text-2xl font-extrabold italic flex items-center gap-2 text-white">
+            <span class="grid place-items-center w-8 h-8 rounded-full bg-[#39FF7A] text-[#0A0F08] not-italic text-sm font-extrabold">F</span>FORMA<span class="text-[#39FF7A]">+</span>
+          </span>
+          <span class="bg-[#39FF7A] text-[#0A0F08] text-sm font-medium px-5 py-2.5 rounded-full">Book a demo ↗</span>
+        </div>
+        <div class="relative z-10 text-center px-4 mt-4">
+          <h2 class="display font-extrabold leading-[.86] text-white" style="font-size:clamp(3rem,11vw,9rem)">STRONGER<br><span class="text-[#39FF7A]">TOGETHER</span></h2>
+        </div>
+        <div class="relative z-10 flex-1 flex items-center justify-between px-5 md:px-10 py-8 gap-6 text-white">
+          <div class="flex items-center gap-3">
+            <span class="w-14 h-14 rounded-full bg-[#39FF7A] text-[#0A0F08] grid place-items-center">▶</span>
+            <span class="text-xs"><span class="block font-medium">WATCH VIDEO</span><span class="text-white/70">See the platform in 90s</span></span>
+          </div>
+          <div class="max-w-[260px] text-sm text-right">
+            <p class="mb-4">Run memberships, classes and coaching from one calm dashboard.</p>
+            <a class="inline-block bg-[#39FF7A] text-[#0A0F08] font-medium px-6 py-3 rounded-full">Start your journey ↗</a>
+          </div>
+        </div>
+        <div class="relative z-10 grid md:grid-cols-3 gap-3 px-4 md:px-6 pb-6">
+          <div class="glass rounded-3xl p-5 text-white">
+            <div class="display text-4xl font-semibold">25K+</div>
+            <p class="text-sm text-white/80">Happy members on FORMA</p>
+          </div>
+          <div class="bg-white text-[#0A0F08] rounded-3xl p-5">
+            <div class="flex justify-between text-sm mb-3"><span class="text-[#0A0F08]/70">This week progress</span><span class="display text-2xl font-semibold">78%</span></div>
+            <div class="h-2.5 bg-[#E8E8EC] rounded-full overflow-hidden mb-5"><div class="h-full bg-[#39FF7A] rounded-full" style="width:78%"></div></div>
+            <div class="grid grid-cols-4 text-center divide-x divide-[#E8E8EC] text-xs text-[#0A0F08]/60">
+              <div>Workouts<p class="display font-semibold text-base text-[#0A0F08]">5/6</p></div>
+              <div>Calories<p class="display font-semibold text-base text-[#0A0F08]">2,450</p></div>
+              <div>Days<p class="display font-semibold text-base text-[#0A0F08]">6</p></div>
+              <div>Hours<p class="display font-semibold text-base text-[#0A0F08]">4.8</p></div>
+            </div>
+          </div>
+          <div class="glass rounded-3xl p-4 flex items-center gap-4 text-white">
+            <img class="w-24 h-24 rounded-2xl object-cover object-top" src="https://images.pexels.com/photos/31918891/pexels-photo-31918891.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=300&w=300" alt="">
+            <div><p class="text-[11px] text-white/70">Your trainer</p><p class="display text-xl font-semibold leading-tight">Alex Morgan</p><p class="text-xs text-white/70">Strength coach</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-10">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+        <div class="w-40 h-40 md:w-44 md:h-44 rounded-full bg-[#0A0F08] grid place-items-center text-center p-6">
+          <div><p class="display text-4xl font-semibold text-[#39FF7A]">100%</p><p class="text-[11px] text-white/60">Train with the best to become your best</p></div>
+        </div>
+        <div class="bg-white rounded-[28px] rounded-br-[80px] p-7 max-w-xl flex gap-6">
+          <span class="display text-3xl font-semibold text-[#39FF7A]">#01</span>
+          <div><h3 class="display text-xl font-semibold mb-2">Trusted by thousands of gyms</h3><p class="text-sm text-[#0A0F08]/60">Join the studios, clubs and training floors that rely on FORMA.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="px-3 md:px-6 pt-16 pb-10">
+      <div class="bg-[#0A0F08] rounded-[32px] p-6 md:p-10 text-white">
+        <div class="grid lg:grid-cols-[.7fr_1.6fr] gap-10">
+          <div>
+            <h2 class="display text-4xl md:text-5xl font-semibold leading-[1] mb-5">One dashboard.<br><span class="text-[#A8A89E]">Every part of your gym.</span></h2>
+            <p class="text-sm text-white/60 mb-6 max-w-sm">Memberships, bookings, billing and coaching — all in one place.</p>
+            <ul class="divide-y divide-white/10 border-y border-white/10 text-sm">
+              <li class="flex justify-between py-3"><span>01 &nbsp; Member management</span><span class="text-[#39FF7A]">→</span></li>
+              <li class="flex justify-between py-3"><span>02 &nbsp; Class scheduling</span><span class="text-[#39FF7A]">→</span></li>
+              <li class="flex justify-between py-3"><span>03 &nbsp; Billing &amp; payments</span><span class="text-[#39FF7A]">→</span></li>
+            </ul>
+          </div>
+          <div class="bg-[#0A0F08] rounded-3xl p-5 border border-white/10">
+            <p class="display text-2xl font-semibold mb-4">Studio overview</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+              <div class="bg-white text-[#0A0F08] rounded-2xl p-3"><p class="text-[11px] text-[#0A0F08]/50">Members</p><p class="display text-xl font-semibold">1,284</p><p class="text-[11px] text-[#1FD060]">+4.2%</p></div>
+              <div class="bg-white text-[#0A0F08] rounded-2xl p-3"><p class="text-[11px] text-[#0A0F08]/50">Check-ins</p><p class="display text-xl font-semibold">3,842</p><p class="text-[11px] text-[#1FD060]">+12%</p></div>
+              <div class="bg-white text-[#0A0F08] rounded-2xl p-3"><p class="text-[11px] text-[#0A0F08]/50">Revenue</p><p class="display text-xl font-semibold">$48.2k</p><p class="text-[11px] text-[#1FD060]">+8.1%</p></div>
+              <div class="bg-[#39FF7A] text-[#0A0F08] rounded-2xl p-3"><p class="text-[11px] text-[#0A0F08]/70">Retention</p><p class="display text-xl font-semibold">92%</p></div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 flex items-end gap-1.5 h-32">
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:55%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:70%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:62%"></div>
+              <div class="flex-1 rounded-t bg-[#39FF7A]" style="height:88%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:78%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:48%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:40%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-8">
+      <h2 class="display text-4xl md:text-5xl font-semibold mb-8 text-center">Simple pricing.<br><span class="text-[#A8A89E]">No surprises.</span></h2>
+      <div class="grid md:grid-cols-3 gap-3">
+        <div class="bg-white rounded-3xl p-6"><p class="text-sm text-[#0A0F08]/60">Starter</p><p class="display text-4xl font-semibold mt-2">$49<span class="text-base text-[#0A0F08]/50 font-normal">/mo</span></p><p class="text-xs text-[#0A0F08]/60 mt-1 mb-4">For boutique studios.</p><button class="pf-btn w-full justify-center">Choose Starter</button></div>
+        <div class="bg-[#0A0F08] text-white rounded-3xl p-6"><div class="flex justify-between"><p class="text-sm text-white/80">Growth</p><span class="text-[10px] bg-[#39FF7A] text-[#0A0F08] rounded-full px-2 py-0.5 font-medium">Most popular</span></div><p class="display text-4xl font-semibold mt-2 text-[#39FF7A]">$129<span class="text-base text-white/70 font-normal">/mo</span></p><p class="text-xs text-white/80 mt-1 mb-4">For growing gyms.</p><button class="pf-btn w-full justify-center" style="background:#39FF7A;color:#0A0F08;border-color:#39FF7A">Choose Growth</button></div>
+        <div class="bg-white rounded-3xl p-6"><p class="text-sm text-[#0A0F08]/60">Scale</p><p class="display text-4xl font-semibold mt-2">$299<span class="text-base text-[#0A0F08]/50 font-normal">/mo</span></p><p class="text-xs text-[#0A0F08]/60 mt-1 mb-4">For multi-location clubs.</p><button class="pf-btn w-full justify-center">Choose Scale</button></div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-12">
+      <div class="bg-[#0A0F08] text-white rounded-[32px] p-8 text-center">
+        <h3 class="display font-extrabold" style="font-size:clamp(2rem,6vw,4.5rem)">GAME ON,<br><span class="text-[#39FF7A]">RUN IT HARD.</span></h3>
+        <p class="text-sm text-white/80 mt-3 mb-5">Start your free 14-day trial. No card required.</p>
+        <div class="flex gap-2 max-w-sm mx-auto">
+          <input class="flex-1 rounded-full px-5 py-3 text-sm bg-white text-[#0A0F08]" placeholder="you@yourgym.com">
+          <button class="rounded-full px-5 py-3 text-sm font-medium bg-[#39FF7A] text-[#0A0F08]">Get started ↗</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= PREVIEW 4 — RED ======================= -->
+<div id="preview-red" data-theme="red" class="preview-frame max-w-[1400px] mx-auto my-6">
+  <div class="preview-toolbar">
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-white/60">Theme</span>
+      <span class="text-sm font-medium text-white">Sport Red</span>
+    </div>
+    <div class="preview-tabs">
+      <button class="active" data-tab="red">Full page</button>
+      <button data-tab="all">All themes</button>
+    </div>
+  </div>
+  <div class="pf-section" style="background:#E9E4DF">
+    <div class="px-3 pt-3">
+      <div class="pf-hero m-2 md:m-3 rounded-[28px] overflow-hidden min-h-[820px]" style="background:#E54B3A">
+        <img class="hero-photo absolute inset-0 w-full h-full object-cover" src="https://images.pexels.com/photos/27948294/pexels-photo-27948294.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1100&w=1800" alt="">
+        <div class="absolute inset-0" style="background:#B8362A;mix-blend-mode:multiply"></div>
+        <div class="absolute inset-0" style="background:#E54B3A;mix-blend-mode:color;opacity:.55"></div>
+        <div class="relative z-10 flex items-center justify-between px-5 md:px-8 py-5">
+          <span class="display text-2xl font-extrabold italic flex items-center gap-2 text-white">
+            <span class="grid place-items-center w-8 h-8 rounded-full bg-white text-[#E54B3A] not-italic text-sm font-extrabold">F</span>FORMA<span class="text-white/70">+</span>
+          </span>
+          <span class="bg-white text-[#E54B3A] text-sm font-medium px-5 py-2.5 rounded-full">Book a demo ↗</span>
+        </div>
+        <div class="relative z-10 text-center px-4 mt-4">
+          <h2 class="display font-extrabold leading-[.86] text-white/90" style="font-size:clamp(3rem,11vw,9rem)">STRONGER<br>TOGETHER</h2>
+        </div>
+        <div class="relative z-10 flex-1 flex items-center justify-between px-5 md:px-10 py-8 gap-6 text-white">
+          <div class="flex items-center gap-3">
+            <span class="w-14 h-14 rounded-full bg-white text-[#E54B3A] grid place-items-center">▶</span>
+            <span class="text-xs"><span class="block font-medium">WATCH VIDEO</span><span class="text-white/70">See the platform in 90s</span></span>
+          </div>
+          <div class="max-w-[260px] text-sm text-right">
+            <p class="mb-4">Run memberships, classes and coaching from one calm dashboard.</p>
+            <a class="inline-block bg-white text-[#E54B3A] font-medium px-6 py-3 rounded-full">Start your journey ↗</a>
+          </div>
+        </div>
+        <div class="relative z-10 grid md:grid-cols-3 gap-3 px-4 md:px-6 pb-6">
+          <div class="glass rounded-3xl p-5 text-white">
+            <div class="display text-4xl font-semibold">25K+</div>
+            <p class="text-sm text-white/80">Happy members on FORMA</p>
+          </div>
+          <div class="bg-white text-[#0E0A0A] rounded-3xl p-5">
+            <div class="flex justify-between text-sm mb-3"><span class="text-[#0E0A0A]/70">This week progress</span><span class="display text-2xl font-semibold">78%</span></div>
+            <div class="h-2.5 bg-[#E8E8EC] rounded-full overflow-hidden mb-5"><div class="h-full bg-[#E54B3A] rounded-full" style="width:78%"></div></div>
+            <div class="grid grid-cols-4 text-center divide-x divide-[#E8E8EC] text-xs text-[#0E0A0A]/60">
+              <div>Workouts<p class="display font-semibold text-base text-[#0E0A0A]">5/6</p></div>
+              <div>Calories<p class="display font-semibold text-base text-[#0E0A0A]">2,450</p></div>
+              <div>Days<p class="display font-semibold text-base text-[#0E0A0A]">6</p></div>
+              <div>Hours<p class="display font-semibold text-base text-[#0E0A0A]">4.8</p></div>
+            </div>
+          </div>
+          <div class="glass rounded-3xl p-4 flex items-center gap-4 text-white">
+            <img class="w-24 h-24 rounded-2xl object-cover object-top" src="https://images.pexels.com/photos/31918891/pexels-photo-31918891.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=300&w=300" alt="">
+            <div><p class="text-[11px] text-white/70">Your trainer</p><p class="display text-xl font-semibold leading-tight">Alex Morgan</p><p class="text-xs text-white/70">Strength coach</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-10">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+        <div class="w-40 h-40 md:w-44 md:h-44 rounded-full bg-white grid place-items-center text-center p-6">
+          <div><p class="display text-4xl font-semibold">100%</p><p class="text-[11px] text-[#0E0A0A]/60">Train with the best to become your best</p></div>
+        </div>
+        <div class="bg-white rounded-[28px] rounded-br-[80px] p-7 max-w-xl flex gap-6">
+          <span class="display text-3xl font-semibold text-[#E54B3A]">#01</span>
+          <div><h3 class="display text-xl font-semibold mb-2">Trusted by thousands of gyms</h3><p class="text-sm text-[#0E0A0A]/60">Join the studios, clubs and training floors that rely on FORMA.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="px-3 md:px-6 pt-16 pb-10">
+      <div class="bg-white rounded-[32px] p-6 md:p-10">
+        <div class="grid lg:grid-cols-[.7fr_1.6fr] gap-10">
+          <div>
+            <h2 class="display text-4xl md:text-5xl font-semibold leading-[1] mb-5">One dashboard.<br><span class="text-[#B5AFA8]">Every part of your gym.</span></h2>
+            <p class="text-sm text-[#0E0A0A]/60 mb-6 max-w-sm">Memberships, bookings, billing and coaching — all in one place.</p>
+            <ul class="divide-y divide-[#0E0A0A]/10 border-y border-[#0E0A0A]/10 text-sm">
+              <li class="flex justify-between py-3"><span>01 &nbsp; Member management</span><span class="text-[#E54B3A]">→</span></li>
+              <li class="flex justify-between py-3"><span>02 &nbsp; Class scheduling</span><span class="text-[#E54B3A]">→</span></li>
+              <li class="flex justify-between py-3"><span>03 &nbsp; Billing &amp; payments</span><span class="text-[#E54B3A]">→</span></li>
+            </ul>
+          </div>
+          <div class="bg-[#F2EFEC] rounded-3xl p-5">
+            <p class="display text-2xl font-semibold mb-4">Studio overview</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#0E0A0A]/50">Members</p><p class="display text-xl font-semibold">1,284</p><p class="text-[11px] text-[#E54B3A]">+4.2%</p></div>
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#0E0A0A]/50">Check-ins</p><p class="display text-xl font-semibold">3,842</p><p class="text-[11px] text-[#E54B3A]">+12%</p></div>
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#0E0A0A]/50">Revenue</p><p class="display text-xl font-semibold">$48.2k</p><p class="text-[11px] text-[#E54B3A]">+8.1%</p></div>
+              <div class="bg-[#E54B3A] text-white rounded-2xl p-3"><p class="text-[11px] text-white/70">Retention</p><p class="display text-xl font-semibold">92%</p></div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 flex items-end gap-1.5 h-32">
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:55%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:70%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:62%"></div>
+              <div class="flex-1 rounded-t bg-[#E54B3A]" style="height:88%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:78%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:48%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:40%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-8">
+      <h2 class="display text-4xl md:text-5xl font-semibold mb-8 text-center">Simple pricing.<br><span class="text-[#B5AFA8]">No surprises.</span></h2>
+      <div class="grid md:grid-cols-3 gap-3">
+        <div class="bg-white rounded-3xl p-6"><p class="text-sm text-[#0E0A0A]/60">Starter</p><p class="display text-4xl font-semibold mt-2">$49<span class="text-base text-[#0E0A0A]/50 font-normal">/mo</span></p><p class="text-xs text-[#0E0A0A]/60 mt-1 mb-4">For boutique studios.</p><button class="pf-btn w-full justify-center">Choose Starter</button></div>
+        <div class="bg-[#E54B3A] text-white rounded-3xl p-6"><div class="flex justify-between"><p class="text-sm text-white/80">Growth</p><span class="text-[10px] bg-white text-[#E54B3A] rounded-full px-2 py-0.5 font-medium">Most popular</span></div><p class="display text-4xl font-semibold mt-2">$129<span class="text-base text-white/70 font-normal">/mo</span></p><p class="text-xs text-white/80 mt-1 mb-4">For growing gyms.</p><button class="pf-btn w-full justify-center" style="background:#fff;color:#E54B3A;border-color:#fff">Choose Growth</button></div>
+        <div class="bg-white rounded-3xl p-6"><p class="text-sm text-[#0E0A0A]/60">Scale</p><p class="display text-4xl font-semibold mt-2">$299<span class="text-base text-[#0E0A0A]/50 font-normal">/mo</span></p><p class="text-xs text-[#0E0A0A]/60 mt-1 mb-4">For multi-location clubs.</p><button class="pf-btn w-full justify-center">Choose Scale</button></div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-12">
+      <div class="bg-[#E54B3A] text-white rounded-[32px] p-8 text-center">
+        <h3 class="display font-extrabold" style="font-size:clamp(2rem,6vw,4.5rem)">GAME ON,<br><span class="text-white/60">RUN IT HARD.</span></h3>
+        <p class="text-sm text-white/80 mt-3 mb-5">Start your free 14-day trial. No card required.</p>
+        <div class="flex gap-2 max-w-sm mx-auto">
+          <input class="flex-1 rounded-full px-5 py-3 text-sm bg-white text-[#0E0A0A]" placeholder="you@yourgym.com">
+          <button class="rounded-full px-5 py-3 text-sm font-medium bg-[#0E0A0A] text-white">Get started ↗</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= PREVIEW 5 — BURGUNDY ======================= -->
+<div id="preview-burgundy" data-theme="burgundy" class="preview-frame max-w-[1400px] mx-auto my-6">
+  <div class="preview-toolbar">
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-white/60">Theme</span>
+      <span class="text-sm font-medium text-white">Burgundy</span>
+    </div>
+    <div class="preview-tabs">
+      <button class="active" data-tab="burgundy">Full page</button>
+      <button data-tab="all">All themes</button>
+    </div>
+  </div>
+  <div class="pf-section" style="background:#E7D9DA">
+    <div class="px-3 pt-3">
+      <div class="pf-hero m-2 md:m-3 rounded-[28px] overflow-hidden min-h-[820px]" style="background:#7A1F2B">
+        <img class="hero-photo absolute inset-0 w-full h-full object-cover" src="https://images.pexels.com/photos/27948294/pexels-photo-27948294.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1100&w=1800" alt="">
+        <div class="absolute inset-0" style="background:#5A1620;mix-blend-mode:multiply"></div>
+        <div class="absolute inset-0" style="background:#7A1F2B;mix-blend-mode:color;opacity:.55"></div>
+        <div class="relative z-10 flex items-center justify-between px-5 md:px-8 py-5">
+          <span class="display text-2xl font-extrabold italic flex items-center gap-2 text-white">
+            <span class="grid place-items-center w-8 h-8 rounded-full bg-white text-[#7A1F2B] not-italic text-sm font-extrabold">F</span>FORMA<span class="text-white/70">+</span>
+          </span>
+          <span class="bg-white text-[#7A1F2B] text-sm font-medium px-5 py-2.5 rounded-full">Book a demo ↗</span>
+        </div>
+        <div class="relative z-10 text-center px-4 mt-4">
+          <h2 class="display font-extrabold leading-[.86] text-white/90" style="font-size:clamp(3rem,11vw,9rem)">STRONGER<br>TOGETHER</h2>
+        </div>
+        <div class="relative z-10 flex-1 flex items-center justify-between px-5 md:px-10 py-8 gap-6 text-white">
+          <div class="flex items-center gap-3">
+            <span class="w-14 h-14 rounded-full bg-white text-[#7A1F2B] grid place-items-center">▶</span>
+            <span class="text-xs"><span class="block font-medium">WATCH VIDEO</span><span class="text-white/70">See the platform in 90s</span></span>
+          </div>
+          <div class="max-w-[260px] text-sm text-right">
+            <p class="mb-4">Run memberships, classes and coaching from one calm dashboard.</p>
+            <a class="inline-block bg-white text-[#7A1F2B] font-medium px-6 py-3 rounded-full">Start your journey ↗</a>
+          </div>
+        </div>
+        <div class="relative z-10 grid md:grid-cols-3 gap-3 px-4 md:px-6 pb-6">
+          <div class="glass rounded-3xl p-5 text-white">
+            <div class="display text-4xl font-semibold">25K+</div>
+            <p class="text-sm text-white/80">Happy members on FORMA</p>
+          </div>
+          <div class="bg-white text-[#16090C] rounded-3xl p-5">
+            <div class="flex justify-between text-sm mb-3"><span class="text-[#16090C]/70">This week progress</span><span class="display text-2xl font-semibold">78%</span></div>
+            <div class="h-2.5 bg-[#E8E8EC] rounded-full overflow-hidden mb-5"><div class="h-full bg-[#7A1F2B] rounded-full" style="width:78%"></div></div>
+            <div class="grid grid-cols-4 text-center divide-x divide-[#E8E8EC] text-xs text-[#16090C]/60">
+              <div>Workouts<p class="display font-semibold text-base text-[#16090C]">5/6</p></div>
+              <div>Calories<p class="display font-semibold text-base text-[#16090C]">2,450</p></div>
+              <div>Days<p class="display font-semibold text-base text-[#16090C]">6</p></div>
+              <div>Hours<p class="display font-semibold text-base text-[#16090C]">4.8</p></div>
+            </div>
+          </div>
+          <div class="glass rounded-3xl p-4 flex items-center gap-4 text-white">
+            <img class="w-24 h-24 rounded-2xl object-cover object-top" src="https://images.pexels.com/photos/31918891/pexels-photo-31918891.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=300&w=300" alt="">
+            <div><p class="text-[11px] text-white/70">Your trainer</p><p class="display text-xl font-semibold leading-tight">Alex Morgan</p><p class="text-xs text-white/70">Strength coach</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-10">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+        <div class="w-40 h-40 md:w-44 md:h-44 rounded-full bg-white grid place-items-center text-center p-6">
+          <div><p class="display text-4xl font-semibold text-[#7A1F2B]">100%</p><p class="text-[11px] text-[#16090C]/60">Train with the best to become your best</p></div>
+        </div>
+        <div class="bg-white rounded-[28px] rounded-br-[80px] p-7 max-w-xl flex gap-6">
+          <span class="display text-3xl font-semibold text-[#7A1F2B]">#01</span>
+          <div><h3 class="display text-xl font-semibold mb-2">Trusted by thousands of gyms</h3><p class="text-sm text-[#16090C]/60">Join the studios, clubs and training floors that rely on FORMA.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="px-3 md:px-6 pt-16 pb-10">
+      <div class="bg-white rounded-[32px] p-6 md:p-10">
+        <div class="grid lg:grid-cols-[.7fr_1.6fr] gap-10">
+          <div>
+            <h2 class="display text-4xl md:text-5xl font-semibold leading-[1] mb-5">One dashboard.<br><span class="text-[#B29A9C]">Every part of your gym.</span></h2>
+            <p class="text-sm text-[#16090C]/60 mb-6 max-w-sm">Memberships, bookings, billing and coaching — all in one place.</p>
+            <ul class="divide-y divide-[#16090C]/10 border-y border-[#16090C]/10 text-sm">
+              <li class="flex justify-between py-3"><span>01 &nbsp; Member management</span><span class="text-[#7A1F2B]">→</span></li>
+              <li class="flex justify-between py-3"><span>02 &nbsp; Class scheduling</span><span class="text-[#7A1F2B]">→</span></li>
+              <li class="flex justify-between py-3"><span>03 &nbsp; Billing &amp; payments</span><span class="text-[#7A1F2B]">→</span></li>
+            </ul>
+          </div>
+          <div class="bg-[#F1E9E8] rounded-3xl p-5">
+            <p class="display text-2xl font-semibold mb-4">Studio overview</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#16090C]/50">Members</p><p class="display text-xl font-semibold">1,284</p><p class="text-[11px] text-[#7A1F2B]">+4.2%</p></div>
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#16090C]/50">Check-ins</p><p class="display text-xl font-semibold">3,842</p><p class="text-[11px] text-[#7A1F2B]">+12%</p></div>
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#16090C]/50">Revenue</p><p class="display text-xl font-semibold">$48.2k</p><p class="text-[11px] text-[#7A1F2B]">+8.1%</p></div>
+              <div class="bg-[#7A1F2B] text-white rounded-2xl p-3"><p class="text-[11px] text-white/70">Retention</p><p class="display text-xl font-semibold">92%</p></div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 flex items-end gap-1.5 h-32">
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:55%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:70%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:62%"></div>
+              <div class="flex-1 rounded-t bg-[#7A1F2B]" style="height:88%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:78%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:48%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:40%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-8">
+      <h2 class="display text-4xl md:text-5xl font-semibold mb-8 text-center">Simple pricing.<br><span class="text-[#B29A9C]">No surprises.</span></h2>
+      <div class="grid md:grid-cols-3 gap-3">
+        <div class="bg-white rounded-3xl p-6"><p class="text-sm text-[#16090C]/60">Starter</p><p class="display text-4xl font-semibold mt-2">$49<span class="text-base text-[#16090C]/50 font-normal">/mo</span></p><p class="text-xs text-[#16090C]/60 mt-1 mb-4">For boutique studios.</p><button class="pf-btn w-full justify-center">Choose Starter</button></div>
+        <div class="bg-[#7A1F2B] text-white rounded-3xl p-6"><div class="flex justify-between"><p class="text-sm text-white/80">Growth</p><span class="text-[10px] bg-white text-[#7A1F2B] rounded-full px-2 py-0.5 font-medium">Most popular</span></div><p class="display text-4xl font-semibold mt-2">$129<span class="text-base text-white/70 font-normal">/mo</span></p><p class="text-xs text-white/80 mt-1 mb-4">For growing gyms.</p><button class="pf-btn w-full justify-center" style="background:#fff;color:#7A1F2B;border-color:#fff">Choose Growth</button></div>
+        <div class="bg-white rounded-3xl p-6"><p class="text-sm text-[#16090C]/60">Scale</p><p class="display text-4xl font-semibold mt-2">$299<span class="text-base text-[#16090C]/50 font-normal">/mo</span></p><p class="text-xs text-[#16090C]/60 mt-1 mb-4">For multi-location clubs.</p><button class="pf-btn w-full justify-center">Choose Scale</button></div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-12">
+      <div class="bg-[#7A1F2B] text-white rounded-[32px] p-8 text-center">
+        <h3 class="display font-extrabold" style="font-size:clamp(2rem,6vw,4.5rem)">GAME ON,<br><span class="text-white/60">RUN IT HARD.</span></h3>
+        <p class="text-sm text-white/80 mt-3 mb-5">Start your free 14-day trial. No card required.</p>
+        <div class="flex gap-2 max-w-sm mx-auto">
+          <input class="flex-1 rounded-full px-5 py-3 text-sm bg-white text-[#16090C]" placeholder="you@yourgym.com">
+          <button class="rounded-full px-5 py-3 text-sm font-medium bg-[#16090C] text-white">Get started ↗</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= PREVIEW 6 — GOLDEN ======================= -->
+<div id="preview-golden" data-theme="golden" class="preview-frame max-w-[1400px] mx-auto my-6">
+  <div class="preview-toolbar">
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-white/60">Theme</span>
+      <span class="text-sm font-medium text-white">Golden</span>
+    </div>
+    <div class="preview-tabs">
+      <button class="active" data-tab="golden">Full page</button>
+      <button data-tab="all">All themes</button>
+    </div>
+  </div>
+  <div class="pf-section" style="background:#E8E1CB">
+    <div class="px-3 pt-3">
+      <div class="pf-hero m-2 md:m-3 rounded-[28px] overflow-hidden min-h-[820px]" style="background:#C99A2E">
+        <img class="hero-photo absolute inset-0 w-full h-full object-cover" src="https://images.pexels.com/photos/27948294/pexels-photo-27948294.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1100&w=1800" alt="">
+        <div class="absolute inset-0" style="background:#9C7519;mix-blend-mode:multiply"></div>
+        <div class="absolute inset-0" style="background:#C99A2E;mix-blend-mode:color;opacity:.55"></div>
+        <div class="relative z-10 flex items-center justify-between px-5 md:px-8 py-5">
+          <span class="display text-2xl font-extrabold italic flex items-center gap-2 text-white">
+            <span class="grid place-items-center w-8 h-8 rounded-full bg-white text-[#C99A2E] not-italic text-sm font-extrabold">F</span>FORMA<span class="text-white/70">+</span>
+          </span>
+          <span class="bg-white text-[#C99A2E] text-sm font-medium px-5 py-2.5 rounded-full">Book a demo ↗</span>
+        </div>
+        <div class="relative z-10 text-center px-4 mt-4">
+          <h2 class="display font-extrabold leading-[.86] text-white/90" style="font-size:clamp(3rem,11vw,9rem)">STRONGER<br>TOGETHER</h2>
+        </div>
+        <div class="relative z-10 flex-1 flex items-center justify-between px-5 md:px-10 py-8 gap-6 text-white">
+          <div class="flex items-center gap-3">
+            <span class="w-14 h-14 rounded-full bg-white text-[#C99A2E] grid place-items-center">▶</span>
+            <span class="text-xs"><span class="block font-medium">WATCH VIDEO</span><span class="text-white/70">See the platform in 90s</span></span>
+          </div>
+          <div class="max-w-[260px] text-sm text-right">
+            <p class="mb-4">Run memberships, classes and coaching from one calm dashboard.</p>
+            <a class="inline-block bg-white text-[#C99A2E] font-medium px-6 py-3 rounded-full">Start your journey ↗</a>
+          </div>
+        </div>
+        <div class="relative z-10 grid md:grid-cols-3 gap-3 px-4 md:px-6 pb-6">
+          <div class="glass rounded-3xl p-5 text-white">
+            <div class="display text-4xl font-semibold">25K+</div>
+            <p class="text-sm text-white/80">Happy members on FORMA</p>
+          </div>
+          <div class="bg-white text-[#14110A] rounded-3xl p-5">
+            <div class="flex justify-between text-sm mb-3"><span class="text-[#14110A]/70">This week progress</span><span class="display text-2xl font-semibold">78%</span></div>
+            <div class="h-2.5 bg-[#E8E8EC] rounded-full overflow-hidden mb-5"><div class="h-full bg-[#C99A2E] rounded-full" style="width:78%"></div></div>
+            <div class="grid grid-cols-4 text-center divide-x divide-[#E8E8EC] text-xs text-[#14110A]/60">
+              <div>Workouts<p class="display font-semibold text-base text-[#14110A]">5/6</p></div>
+              <div>Calories<p class="display font-semibold text-base text-[#14110A]">2,450</p></div>
+              <div>Days<p class="display font-semibold text-base text-[#14110A]">6</p></div>
+              <div>Hours<p class="display font-semibold text-base text-[#14110A]">4.8</p></div>
+            </div>
+          </div>
+          <div class="glass rounded-3xl p-4 flex items-center gap-4 text-white">
+            <img class="w-24 h-24 rounded-2xl object-cover object-top" src="https://images.pexels.com/photos/31918891/pexels-photo-31918891.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=300&w=300" alt="">
+            <div><p class="text-[11px] text-white/70">Your trainer</p><p class="display text-xl font-semibold leading-tight">Alex Morgan</p><p class="text-xs text-white/70">Strength coach</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-10">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+        <div class="w-40 h-40 md:w-44 md:h-44 rounded-full bg-white grid place-items-center text-center p-6">
+          <div><p class="display text-4xl font-semibold text-[#C99A2E]">100%</p><p class="text-[11px] text-[#14110A]/60">Train with the best to become your best</p></div>
+        </div>
+        <div class="bg-white rounded-[28px] rounded-br-[80px] p-7 max-w-xl flex gap-6">
+          <span class="display text-3xl font-semibold text-[#C99A2E]">#01</span>
+          <div><h3 class="display text-xl font-semibold mb-2">Trusted by thousands of gyms</h3><p class="text-sm text-[#14110A]/60">Join the studios, clubs and training floors that rely on FORMA.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="px-3 md:px-6 pt-16 pb-10">
+      <div class="bg-white rounded-[32px] p-6 md:p-10">
+        <div class="grid lg:grid-cols-[.7fr_1.6fr] gap-10">
+          <div>
+            <h2 class="display text-4xl md:text-5xl font-semibold leading-[1] mb-5">One dashboard.<br><span class="text-[#B5A98C]">Every part of your gym.</span></h2>
+            <p class="text-sm text-[#14110A]/60 mb-6 max-w-sm">Memberships, bookings, billing and coaching — all in one place.</p>
+            <ul class="divide-y divide-[#14110A]/10 border-y border-[#14110A]/10 text-sm">
+              <li class="flex justify-between py-3"><span>01 &nbsp; Member management</span><span class="text-[#C99A2E]">→</span></li>
+              <li class="flex justify-between py-3"><span>02 &nbsp; Class scheduling</span><span class="text-[#C99A2E]">→</span></li>
+              <li class="flex justify-between py-3"><span>03 &nbsp; Billing &amp; payments</span><span class="text-[#C99A2E]">→</span></li>
+            </ul>
+          </div>
+          <div class="bg-[#F1ECDD] rounded-3xl p-5">
+            <p class="display text-2xl font-semibold mb-4">Studio overview</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#14110A]/50">Members</p><p class="display text-xl font-semibold">1,284</p><p class="text-[11px] text-[#C99A2E]">+4.2%</p></div>
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#14110A]/50">Check-ins</p><p class="display text-xl font-semibold">3,842</p><p class="text-[11px] text-[#C99A2E]">+12%</p></div>
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#14110A]/50">Revenue</p><p class="display text-xl font-semibold">$48.2k</p><p class="text-[11px] text-[#C99A2E]">+8.1%</p></div>
+              <div class="bg-[#C99A2E] text-[#14110A] rounded-2xl p-3"><p class="text-[11px] text-[#14110A]/70">Retention</p><p class="display text-xl font-semibold">92%</p></div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 flex items-end gap-1.5 h-32">
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:55%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:70%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:62%"></div>
+              <div class="flex-1 rounded-t bg-[#C99A2E]" style="height:88%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:78%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:48%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:40%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-8">
+      <h2 class="display text-4xl md:text-5xl font-semibold mb-8 text-center">Simple pricing.<br><span class="text-[#B5A98C]">No surprises.</span></h2>
+      <div class="grid md:grid-cols-3 gap-3">
+        <div class="bg-white rounded-3xl p-6"><p class="text-sm text-[#14110A]/60">Starter</p><p class="display text-4xl font-semibold mt-2">$49<span class="text-base text-[#14110A]/50 font-normal">/mo</span></p><p class="text-xs text-[#14110A]/60 mt-1 mb-4">For boutique studios.</p><button class="pf-btn w-full justify-center">Choose Starter</button></div>
+        <div class="bg-[#C99A2E] text-[#14110A] rounded-3xl p-6"><div class="flex justify-between"><p class="text-sm text-[#14110A]/80">Growth</p><span class="text-[10px] bg-white text-[#C99A2E] rounded-full px-2 py-0.5 font-medium">Most popular</span></div><p class="display text-4xl font-semibold mt-2">$129<span class="text-base text-[#14110A]/70 font-normal">/mo</span></p><p class="text-xs text-[#14110A]/80 mt-1 mb-4">For growing gyms.</p><button class="pf-btn w-full justify-center" style="background:#fff;color:#C99A2E;border-color:#fff">Choose Growth</button></div>
+        <div class="bg-white rounded-3xl p-6"><p class="text-sm text-[#14110A]/60">Scale</p><p class="display text-4xl font-semibold mt-2">$299<span class="text-base text-[#14110A]/50 font-normal">/mo</span></p><p class="text-xs text-[#14110A]/60 mt-1 mb-4">For multi-location clubs.</p><button class="pf-btn w-full justify-center">Choose Scale</button></div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-12">
+      <div class="bg-[#C99A2E] text-[#14110A] rounded-[32px] p-8 text-center">
+        <h3 class="display font-extrabold" style="font-size:clamp(2rem,6vw,4.5rem)">GAME ON,<br><span class="text-[#14110A]/60">RUN IT HARD.</span></h3>
+        <p class="text-sm text-[#14110A]/80 mt-3 mb-5">Start your free 14-day trial. No card required.</p>
+        <div class="flex gap-2 max-w-sm mx-auto">
+          <input class="flex-1 rounded-full px-5 py-3 text-sm bg-white text-[#14110A]" placeholder="you@yourgym.com">
+          <button class="rounded-full px-5 py-3 text-sm font-medium bg-[#14110A] text-white">Get started ↗</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= PREVIEW 7 — ORANGE ======================= -->
+<div id="preview-orange" data-theme="orange" class="preview-frame max-w-[1400px] mx-auto my-6">
+  <div class="preview-toolbar">
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-white/60">Theme</span>
+      <span class="text-sm font-medium text-white">Sunset Orange</span>
+    </div>
+    <div class="preview-tabs">
+      <button class="active" data-tab="orange">Full page</button>
+      <button data-tab="all">All themes</button>
+    </div>
+  </div>
+  <div class="pf-section" style="background:#E9DFC9">
+    <div class="px-3 pt-3">
+      <div class="pf-hero m-2 md:m-3 rounded-[28px] overflow-hidden min-h-[820px]" style="background:#E8772E">
+        <img class="hero-photo absolute inset-0 w-full h-full object-cover" src="https://images.pexels.com/photos/27948294/pexels-photo-27948294.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1100&w=1800" alt="">
+        <div class="absolute inset-0" style="background:#B85A1E;mix-blend-mode:multiply"></div>
+        <div class="absolute inset-0" style="background:#E8772E;mix-blend-mode:color;opacity:.55"></div>
+        <div class="relative z-10 flex items-center justify-between px-5 md:px-8 py-5">
+          <span class="display text-2xl font-extrabold italic flex items-center gap-2 text-white">
+            <span class="grid place-items-center w-8 h-8 rounded-full bg-white text-[#E8772E] not-italic text-sm font-extrabold">F</span>FORMA<span class="text-white/70">+</span>
+          </span>
+          <span class="bg-white text-[#E8772E] text-sm font-medium px-5 py-2.5 rounded-full">Book a demo ↗</span>
+        </div>
+        <div class="relative z-10 text-center px-4 mt-4">
+          <h2 class="display font-extrabold leading-[.86] text-white/90" style="font-size:clamp(3rem,11vw,9rem)">STRONGER<br>TOGETHER</h2>
+        </div>
+        <div class="relative z-10 flex-1 flex items-center justify-between px-5 md:px-10 py-8 gap-6 text-white">
+          <div class="flex items-center gap-3">
+            <span class="w-14 h-14 rounded-full bg-white text-[#E8772E] grid place-items-center">▶</span>
+            <span class="text-xs"><span class="block font-medium">WATCH VIDEO</span><span class="text-white/70">See the platform in 90s</span></span>
+          </div>
+          <div class="max-w-[260px] text-sm text-right">
+            <p class="mb-4">Run memberships, classes and coaching from one calm dashboard.</p>
+            <a class="inline-block bg-white text-[#E8772E] font-medium px-6 py-3 rounded-full">Start your journey ↗</a>
+          </div>
+        </div>
+        <div class="relative z-10 grid md:grid-cols-3 gap-3 px-4 md:px-6 pb-6">
+          <div class="glass rounded-3xl p-5 text-white">
+            <div class="display text-4xl font-semibold">25K+</div>
+            <p class="text-sm text-white/80">Happy members on FORMA</p>
+          </div>
+          <div class="bg-white text-[#160E07] rounded-3xl p-5">
+            <div class="flex justify-between text-sm mb-3"><span class="text-[#160E07]/70">This week progress</span><span class="display text-2xl font-semibold">78%</span></div>
+            <div class="h-2.5 bg-[#E8E8EC] rounded-full overflow-hidden mb-5"><div class="h-full bg-[#E8772E] rounded-full" style="width:78%"></div></div>
+            <div class="grid grid-cols-4 text-center divide-x divide-[#E8E8EC] text-xs text-[#160E07]/60">
+              <div>Workouts<p class="display font-semibold text-base text-[#160E07]">5/6</p></div>
+              <div>Calories<p class="display font-semibold text-base text-[#160E07]">2,450</p></div>
+              <div>Days<p class="display font-semibold text-base text-[#160E07]">6</p></div>
+              <div>Hours<p class="display font-semibold text-base text-[#160E07]">4.8</p></div>
+            </div>
+          </div>
+          <div class="glass rounded-3xl p-4 flex items-center gap-4 text-white">
+            <img class="w-24 h-24 rounded-2xl object-cover object-top" src="https://images.pexels.com/photos/31918891/pexels-photo-31918891.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=300&w=300" alt="">
+            <div><p class="text-[11px] text-white/70">Your trainer</p><p class="display text-xl font-semibold leading-tight">Alex Morgan</p><p class="text-xs text-white/70">Strength coach</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-10">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+        <div class="w-40 h-40 md:w-44 md:h-44 rounded-full bg-white grid place-items-center text-center p-6">
+          <div><p class="display text-4xl font-semibold text-[#E8772E]">100%</p><p class="text-[11px] text-[#160E07]/60">Train with the best to become your best</p></div>
+        </div>
+        <div class="bg-white rounded-[28px] rounded-br-[80px] p-7 max-w-xl flex gap-6">
+          <span class="display text-3xl font-semibold text-[#E8772E]">#01</span>
+          <div><h3 class="display text-xl font-semibold mb-2">Trusted by thousands of gyms</h3><p class="text-sm text-[#160E07]/60">Join the studios, clubs and training floors that rely on FORMA.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="px-3 md:px-6 pt-16 pb-10">
+      <div class="bg-white rounded-[32px] p-6 md:p-10">
+        <div class="grid lg:grid-cols-[.7fr_1.6fr] gap-10">
+          <div>
+            <h2 class="display text-4xl md:text-5xl font-semibold leading-[1] mb-5">One dashboard.<br><span class="text-[#B5A893]">Every part of your gym.</span></h2>
+            <p class="text-sm text-[#160E07]/60 mb-6 max-w-sm">Memberships, bookings, billing and coaching — all in one place.</p>
+            <ul class="divide-y divide-[#160E07]/10 border-y border-[#160E07]/10 text-sm">
+              <li class="flex justify-between py-3"><span>01 &nbsp; Member management</span><span class="text-[#E8772E]">→</span></li>
+              <li class="flex justify-between py-3"><span>02 &nbsp; Class scheduling</span><span class="text-[#E8772E]">→</span></li>
+              <li class="flex justify-between py-3"><span>03 &nbsp; Billing &amp; payments</span><span class="text-[#E8772E]">→</span></li>
+            </ul>
+          </div>
+          <div class="bg-[#F2EADD] rounded-3xl p-5">
+            <p class="display text-2xl font-semibold mb-4">Studio overview</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#160E07]/50">Members</p><p class="display text-xl font-semibold">1,284</p><p class="text-[11px] text-[#E8772E]">+4.2%</p></div>
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#160E07]/50">Check-ins</p><p class="display text-xl font-semibold">3,842</p><p class="text-[11px] text-[#E8772E]">+12%</p></div>
+              <div class="bg-white rounded-2xl p-3"><p class="text-[11px] text-[#160E07]/50">Revenue</p><p class="display text-xl font-semibold">$48.2k</p><p class="text-[11px] text-[#E8772E]">+8.1%</p></div>
+              <div class="bg-[#E8772E] text-[#160E07] rounded-2xl p-3"><p class="text-[11px] text-[#160E07]/70">Retention</p><p class="display text-xl font-semibold">92%</p></div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 flex items-end gap-1.5 h-32">
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:55%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:70%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:62%"></div>
+              <div class="flex-1 rounded-t bg-[#E8772E]" style="height:88%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:78%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:48%"></div>
+              <div class="flex-1 rounded-t bg-[#E8E8EC]" style="height:40%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-8">
+      <h2 class="display text-4xl md:text-5xl font-semibold mb-8 text-center">Simple pricing.<br><span class="text-[#B5A893]">No surprises.</span></h2>
+      <div class="grid md:grid-cols-3 gap-3">
+        <div class="bg-white rounded-3xl p-6"><p class="text-sm text-[#160E07]/60">Starter</p><p class="display text-4xl font-semibold mt-2">$49<span class="text-base text-[#160E07]/50 font-normal">/mo</span></p><p class="text-xs text-[#160E07]/60 mt-1 mb-4">For boutique studios.</p><button class="pf-btn w-full justify-center">Choose Starter</button></div>
+        <div class="bg-[#E8772E] text-[#160E07] rounded-3xl p-6"><div class="flex justify-between"><p class="text-sm text-[#160E07]/80">Growth</p><span class="text-[10px] bg-white text-[#E8772E] rounded-full px-2 py-0.5 font-medium">Most popular</span></div><p class="display text-4xl font-semibold mt-2">$129<span class="text-base text-[#160E07]/70 font-normal">/mo</span></p><p class="text-xs text-[#160E07]/80 mt-1 mb-4">For growing gyms.</p><button class="pf-btn w-full justify-center" style="background:#fff;color:#E8772E;border-color:#fff">Choose Growth</button></div>
+        <div class="bg-white rounded-3xl p-6"><p class="text-sm text-[#160E07]/60">Scale</p><p class="display text-4xl font-semibold mt-2">$299<span class="text-base text-[#160E07]/50 font-normal">/mo</span></p><p class="text-xs text-[#160E07]/60 mt-1 mb-4">For multi-location clubs.</p><button class="pf-btn w-full justify-center">Choose Scale</button></div>
+      </div>
+    </div>
+    <div class="px-5 md:px-10 pt-12">
+      <div class="bg-[#E8772E] text-[#160E07] rounded-[32px] p-8 text-center">
+        <h3 class="display font-extrabold" style="font-size:clamp(2rem,6vw,4.5rem)">GAME ON,<br><span class="text-[#160E07]/60">RUN IT HARD.</span></h3>
+        <p class="text-sm text-[#160E07]/80 mt-3 mb-5">Start your free 14-day trial. No card required.</p>
+        <div class="flex gap-2 max-w-sm mx-auto">
+          <input class="flex-1 rounded-full px-5 py-3 text-sm bg-white text-[#160E07]" placeholder="you@yourgym.com">
+          <button class="rounded-full px-5 py-3 text-sm font-medium bg-[#160E07] text-white">Get started ↗</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="max-w-[1400px] mx-auto px-6 md:px-12 py-12 text-xs text-white/40 flex justify-between">
+  <span>© 2026 FORMA — Theme preview</span>
+  <span>Single file · 7 palettes</span>
+</footer>
+
+<script>
+  // Smooth scroll from theme card
+  document.querySelectorAll('#themeCards .swatch-card').forEach(card => {
+    card.addEventListener('click', e => {
+      const target = card.getAttribute('href');
+      if (target && target.startsWith('#')) {
+        e.preventDefault();
+        const el = document.querySelector(target);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // Preview toolbar "All themes" jumps back to the picker
+  document.querySelectorAll('.preview-tabs button[data-tab="all"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  // Active tab on each preview's own toolbar
+  document.querySelectorAll('.preview-tabs').forEach(group => {
+    const buttons = group.querySelectorAll('button');
+    buttons.forEach(b => b.addEventListener('click', () => {
+      buttons.forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+    }));
+  });
+</script>
+</body>
+</html>
